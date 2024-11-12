@@ -1,4 +1,4 @@
-package iesb.pg2024.project.app;
+package iesb.pg2024.project.dataset;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -15,7 +15,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-public class ProjectTempMain {	
+public class EdgeCreator {	
 	public static final String DIRECTORY_HIERACHY = "Hierarquia de Diretório";
 	public static final String EXTEND_HIERACHY = "Extend";
 	public static final String IMPLEMENT_HIERACHY = "Implement";
@@ -152,9 +152,4 @@ public class ProjectTempMain {
         }
     }
 
-    public static void main(String[] args) {
-    	directoryToAnalyze("C:\\Users\\2222130009\\Downloads\\rt");
-        // Exemplo de classes para analisar
-        
-    }
 }

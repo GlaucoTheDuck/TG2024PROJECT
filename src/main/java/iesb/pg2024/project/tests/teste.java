@@ -1,4 +1,4 @@
-package iesb.pg2024.project.app;
+package iesb.pg2024.project.tests;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
