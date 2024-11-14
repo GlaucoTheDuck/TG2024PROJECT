@@ -1,4 +1,4 @@
-package iesb.pg2024.project.app;
+package iesb.pg2024.project.dataset;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
@@ -9,23 +9,38 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-public class ProjectTempMain {	
+public class DatasetGenerator {	
 	public static final String DIRECTORY_HIERACHY = "Hierarquia de Diretório";
 	public static final String EXTEND_HIERACHY = "Extend";
 	public static final String IMPLEMENT_HIERACHY = "Implement";
 	public static final String ARCHIVE_HIERACHY = "Hierarquia em Arquivo";
-
+	
+	static BufferedWriter bw;
+	
+	public DatasetGenerator() {
+		File arquivo = new File("C:\\Users\\maisg\\eclipse-workspace\\iesb_pg2024_project\\src\\main\\java\\iesb\\pg2024\\project\\dataset\\arestas.txt");
+		FileWriter fw = null;
+		try {
+			fw = new FileWriter(arquivo, false);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	    this.bw = new BufferedWriter(fw);
+	}
+    
 	
 	public static Map<String, List<String>> directoryHierachy = new Hashtable<>();
 	public static Map<String, List<String>> aresta = new Hashtable<>();
 	
-	public static void addAresta(String from, String to, String description) {
+	public static void addAresta(String from, String to, long weight, String description) {
 		
 		if(!aresta.containsKey(from)) {
         	aresta.put(from, new ArrayList<String>());
@@ -35,18 +50,18 @@ public class ProjectTempMain {
         	return;
         }
 		
-        File arquivo = new File("C:\\Users\\2222130009\\Downloads\\rt\\arestas.txt");
         
         try {
-            // Cria FileWriter com modo de "append" (verdadeiro para adicionar ao final do arquivo, falso para sobrescrever)
-            FileWriter fw = new FileWriter(arquivo, true);
-            BufferedWriter bw = new BufferedWriter(fw);
-
-            // Escreve o texto
-            bw.write(from +";"+ to +";"+description+"\n");
-            
+            if(weight == -1) {
+            	if(description == IMPLEMENT_HIERACHY)
+            		bw.write(from +";"+ to +";"+description+";(Peso Inválido para implementação)\n");
+            	else
+            		bw.write(from +";"+ to +";"+description+";(Falha ao aplicar peso)\n");
+            }else {
+            bw.write(from +";"+ to +";"+description+";"+weight+"\n");
+            }
             // Fecha o BufferedWriter para liberar o recurso
-            bw.close();
+            
             System.out.println("[Log] >> Texto escrito no arquivo com sucesso!");
             
             	aresta.get(from).add(to);
@@ -66,13 +81,13 @@ public class ProjectTempMain {
                 if (superName != null) {
                 	superName = superName.replace('/', '.');
                     System.out.println("[Log] >> Extends: " + superName);
-                    addAresta(superName, name, EXTEND_HIERACHY);
+                    addAresta(superName, name,instantionTime(superName), EXTEND_HIERACHY);
                 }
                 for (String iface : interfaces) {
                 	String ifaceModified = iface.replace('/', '.');
                     System.out.println("[Log] >> Implements: " + ifaceModified);
                     
-                    addAresta(ifaceModified, name, IMPLEMENT_HIERACHY);
+                    addAresta(ifaceModified, name,-1, IMPLEMENT_HIERACHY);
                     try {
                     	System.out.println("[Log] >> Adicionando Implement");
                     	analyzeClass(iface);
@@ -90,15 +105,37 @@ public class ProjectTempMain {
         }, 0);
     }
     
+    public static long instantionTime(String className) {
+        // Obtenha a classe pelo nome
+        long instantiationTime;
+		try {
+			Class<?> clazz = Class.forName(className);
+	        long startTime = System.nanoTime();
+			Object timed = clazz.newInstance();
+	        long finalTime = System.nanoTime();
+	        
+	        instantiationTime = finalTime - startTime;
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return -1;
+		}
+        
+		return instantiationTime;
+        
+    }
+    
     public static void directoryToAnalyze(String javaLibPath) {
         File dir = new File(javaLibPath);
-        if(!dir.exists()) return; 
-        
+        if(!dir.exists()) { 
+        	System.out.println("Diretório não encontrado!");
+        	return; 
+        }
         File[] arquivosArray = dir.listFiles();
         List<File> arquivosLista = Arrays.asList(arquivosArray);
         // Filtrar arquivos .class
         FilenameFilter classFilter = (d, name) -> name.endsWith(".class");
-
+        
         // Listar arquivos .class
         String[] classFiles = dir.list(classFilter);
         if (classFiles != null) {
@@ -124,9 +161,9 @@ public class ProjectTempMain {
                 } catch (IOException e) {
                     System.err.println("[Alert] >> Erro ao analisar " + className + ": " + e.getMessage());
                     if(name.lastIndexOf('/') != -1) {
-                    	addAresta(name.substring(name.lastIndexOf('/') + 1), className, ARCHIVE_HIERACHY + " (Erro de Analise)");
+                    	addAresta(name.substring(name.lastIndexOf('/') + 1), className, instantionTime((name + "/" + className).replace('/','.')), ARCHIVE_HIERACHY + " (Erro de Analise)");
                     } else {
-                    	addAresta(name, className, ARCHIVE_HIERACHY + " (Erro de Analise)");
+                    	addAresta(name, className, instantionTime((name + "/" + className).replace('/','.')), ARCHIVE_HIERACHY + " (Erro de Analise)");
                     }
                 }
             }
@@ -143,7 +180,7 @@ public class ProjectTempMain {
             	String from = javaLibPath.substring(penultCaseString + 1, lastCaseString);
             	String to = javaLibPath.substring(lastCaseString + 1);
             	
-	            addAresta(from, to, DIRECTORY_HIERACHY);
+	            addAresta(from, to, -1, DIRECTORY_HIERACHY);
 	            	
             	}
             	
@@ -152,9 +189,14 @@ public class ProjectTempMain {
         }
     }
 
-    public static void main(String[] args) {
-    	directoryToAnalyze("C:\\Users\\2222130009\\Downloads\\rt");
+    public void generateDataSet() {
+    	directoryToAnalyze("C:\\Users\\maisg\\eclipse-workspace\\iesb_pg2024_project\\src\\main\\java\\iesb\\pg2024\\project\\util\\rt");
         // Exemplo de classes para analisar
-        
+        try {
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }
