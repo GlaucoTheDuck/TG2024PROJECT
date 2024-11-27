@@ -112,4 +112,10 @@ public class Grafo {
 			System.out.println(vertice.getRotulo());
 		}
 	}
+	
+	public int getWeight(String verticeInicial, String verticeFinal){
+		int linha = this.rotulosEmIndices.get(verticeInicial);
+		int coluna = this.rotulosEmIndices.get(verticeFinal);
+		return this.matrizAdjacencia.getWeight(linha, coluna);
+	}
 }

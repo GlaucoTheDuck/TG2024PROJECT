@@ -53,7 +53,7 @@ public class MatrizAdjacencia {
 		List<Vertice> adjacencias = new ArrayList<Vertice>();
 		
 		for (int j = 0; j < this.vertices.size(); j++) {
-			if(this.matriz[linha][j] == 1) {
+			if(this.matriz[linha][j] != 0) {
 				Vertice vertice = this.vertices.get(j);
 				adjacencias.add(vertice);
 			}
@@ -61,4 +61,8 @@ public class MatrizAdjacencia {
 		
 		return adjacencias;
 	}	
+	
+	public int getWeight(int indiceVerticeInicial, int indiceVerticeFinal){
+		return matriz[indiceVerticeInicial][indiceVerticeFinal];
+	}
 }

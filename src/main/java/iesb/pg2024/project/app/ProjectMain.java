@@ -4,16 +4,19 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import iesb.pg2024.project.core.Grafo;
+import iesb.pg2024.project.core.Vertice;
 
 //import iesb.pg2024.project.dataset.datasetGenerate;
 
 import iesb.pg2024.project.dataset.DatasetGenerator;
 import iesb.pg2024.project.search.BuscaEmProfundidade;
+import iesb.pg2024.project.search.Caminho;
 
 public class ProjectMain {
 	
@@ -32,23 +35,23 @@ public class ProjectMain {
 			String line;
 			String labels[] = new String[4];
 			
-			System.out.println(">> Counting nodes...");
+//			System.out.println(">> Counting nodes...");
 			do {
 				labels = br.readLine().split(";");
 				vertices.add(labels[0]);
 				vertices.add(labels[1]);
 			} while ((line = br.readLine())!= null);
-			System.out.println(">> Quantity of Nodes: [" + vertices.size() + "]");
+//			System.out.println(">> Quantity of Nodes: [" + vertices.size() + "]");
 			
-			System.out.println(">> Adding Nodes...");
+//			System.out.println(">> Adding Nodes...");
 			grafo = new Grafo(vertices.size());
 			for (String string : vertices) {
 				grafo.adicionarVertices(string);
 			}
-			System.out.println(">> Nodes added.");
+//			System.out.println(">> Nodes added.");
 			br.close();
 			
-			System.out.println(">> Adding edges...");
+//			System.out.println(">> Adding edges...");
 			br = new BufferedReader(new FileReader(arestas));
 			Pattern p = Pattern.compile("[0-9]+");
 			Matcher m;
@@ -60,16 +63,30 @@ public class ProjectMain {
 //					System.out.println(">> " + labels[0] + " -> " + labels[1]);//test
 //					System.out.println(">> Weight: " + labels[3]);//test
 				}else {
-					grafo.conectarVertices(labels[0], labels[1], 0);
+					grafo.conectarVertices(labels[0], labels[1], 1);
 				}
 			} while ((line = br.readLine())!= null);
 			br.close();
-			System.out.println(">> Edges added.");
+//			System.out.println(">> Edges added.");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
+		String origem = "java.lang.UnsupportedOperationException";
+		String destino = "java.lang.Object";
+		BuscaEmProfundidade buscaEmProfundidade = BuscaEmProfundidade.getInstance();
+		List<String> caminho = buscaEmProfundidade.buscar(grafo, origem, destino);
+		int weight = 0;
+		
+		for (int i = 0; i < caminho.size(); i++) {
+			System.out.print(" -> " + caminho.get(i));
+			if(i+1 != caminho.size()) {
+				weight += grafo.getWeight(caminho.get(i), caminho.get(i+1));
+			}
 		}
+		System.out.println();
+		System.out.println(">> Tempo: " + weight + " nanosegundos.");
+	}
 	/*String className = "java.lang.instrument";
             // Obtenha a classe pelo nome
             Class<?> clazz = Class.forName(className);
