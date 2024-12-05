@@ -33,13 +33,17 @@ public class ProjectMain {
 			BufferedReader br = new BufferedReader(new FileReader(arestas));
 			Set<String> vertices = new HashSet<String>();
 			String line;
-			String labels[] = new String[4];
+			String labels[];
+			String subLabels[];
 			
 //			System.out.println(">> Counting nodes...");
 			do {
 				labels = br.readLine().split(";");
-				vertices.add(labels[0]);
-				vertices.add(labels[1]);
+
+				subLabels = labels[0].split("\\.");
+				vertices.add(subLabels[subLabels.length-1]);
+				subLabels = labels[1].split("\\.");
+				vertices.add(subLabels[subLabels.length-1]);
 			} while ((line = br.readLine())!= null);
 //			System.out.println(">> Quantity of Nodes: [" + vertices.size() + "]");
 			
@@ -58,12 +62,16 @@ public class ProjectMain {
 			do {
 				labels = br.readLine().split(";");
 				m = p.matcher(labels[3]);
+				subLabels = labels[0].split("\\.");
+				String vertice1 = subLabels[subLabels.length-1];
+				subLabels = labels[1].split("\\.");
+				String vertice2 = subLabels[subLabels.length-1];
 				if(m.matches()) {
-					grafo.conectarVertices(labels[0], labels[1], Integer.parseInt(labels[3]));
+					grafo.conectarVertices(vertice1, vertice2, Integer.parseInt(labels[3]));
 //					System.out.println(">> " + labels[0] + " -> " + labels[1]);//test
 //					System.out.println(">> Weight: " + labels[3]);//test
 				}else {
-					grafo.conectarVertices(labels[0], labels[1], 1);
+					grafo.conectarVertices(vertice1, vertice2, 1);
 				}
 			} while ((line = br.readLine())!= null);
 			br.close();
@@ -72,20 +80,24 @@ public class ProjectMain {
 			e.printStackTrace();
 		}
 		
-		String origem = "java.lang.UnsupportedOperationException";
-		String destino = "java.lang.Object";
+		String origem = "UnsupportedOperationException";
+		String destino = "Object";
 		BuscaEmProfundidade buscaEmProfundidade = BuscaEmProfundidade.getInstance();
 		List<String> caminho = buscaEmProfundidade.buscar(grafo, origem, destino);
-		int weight = 0;
 		
-		for (int i = 0; i < caminho.size(); i++) {
-			System.out.print(" -> " + caminho.get(i));
-			if(i+1 != caminho.size()) {
-				weight += grafo.getWeight(caminho.get(i), caminho.get(i+1));
+		System.out.println("(" + caminho.get(caminho.size()-1) + ")");
+		int ultimoPesoVertice = 0;
+		for (int i = caminho.size()-2; i > -1; i--) {
+			System.out.println(" |");
+			System.out.println(" V");
+			System.out.print("(" + caminho.get(i) + " - Peso: ");
+			if(i == 0) {
+				System.out.println("0 nanosegundos)");
+			}else {
+				ultimoPesoVertice = grafo.getWeight(caminho.get(i), caminho.get(i+1)) - ultimoPesoVertice;
+				System.out.println(ultimoPesoVertice + " nanosegundos)");
 			}
 		}
-		System.out.println();
-		System.out.println(">> Tempo: " + weight + " nanosegundos.");
 	}
 	/*String className = "java.lang.instrument";
             // Obtenha a classe pelo nome
