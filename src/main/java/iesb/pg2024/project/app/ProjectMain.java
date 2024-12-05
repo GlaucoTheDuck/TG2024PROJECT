@@ -80,27 +80,24 @@ public class ProjectMain {
 			e.printStackTrace();
 		}
 		
-		String origem = "UnsupportedOperationException";
-		String destino = "rt";
+		String origem = "rt";
+		String destino = "UnsupportedOperationException";
 		BuscaEmProfundidade buscaEmProfundidade = BuscaEmProfundidade.getInstance();
 		List<String> caminho = buscaEmProfundidade.buscar(grafo, origem, destino);
 		
-		System.out.println("(" + caminho.get(caminho.size()-1) + ")");
-		int ultimoPesoVertice = 0;
-		for (int i = caminho.size()-2; i > -1; i--) {
-			System.out.println(" |");
-			System.out.println(" V");
-			System.out.print("(" + caminho.get(i) + " - Peso: ");
-			if(i == 0) {
-				System.out.println("<100 nanosegundos)");
+		System.out.println("(" + caminho.get(0) + ")");
+		int pesoUltimaAresta = grafo.getWeight(caminho.get(0), caminho.get(1));
+		int pesoArestaAtual = 0;
+		int pesoVertice = 0;
+		for (int i = 1; i < caminho.size(); i++) {
+			if(i != caminho.size()-1) pesoArestaAtual = grafo.getWeight(caminho.get(i), caminho.get(i+1));
+			pesoVertice = pesoArestaAtual - pesoUltimaAresta;
+			if(pesoVertice <= 0) {
+				System.out.println("(" + caminho.get(i) + " - Peso: <100 nanosegundos)");
 			}else {
-				ultimoPesoVertice = grafo.getWeight(caminho.get(i), caminho.get(i+1)) - ultimoPesoVertice;
-				if(ultimoPesoVertice == 0) {
-					System.out.println("<100 nanosegundos)");
-				}else {
-					System.out.println(ultimoPesoVertice + " nanosegundos)");
-				}
+				System.out.println("(" + caminho.get(i) + " - Peso: " + pesoVertice + " nanosegundos)");
 			}
+			pesoUltimaAresta = pesoArestaAtual;
 		}
 	}
 	/*String className = "java.lang.instrument";
