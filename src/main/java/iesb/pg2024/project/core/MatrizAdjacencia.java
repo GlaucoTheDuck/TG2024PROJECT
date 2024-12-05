@@ -20,7 +20,7 @@ public class MatrizAdjacencia {
 		this.matriz = new int[this.qtdVertices][this.qtdVertices];
 		
 		// inicializar a minha matriz de adjacencia
-		this.inicializarMatriz(0);
+		this.inicializarMatriz(-1);
 	}
 	
 	private void inicializarMatriz(int valorInicial) {
@@ -53,7 +53,7 @@ public class MatrizAdjacencia {
 		List<Vertice> adjacencias = new ArrayList<Vertice>();
 		
 		for (int j = 0; j < this.vertices.size(); j++) {
-			if(this.matriz[linha][j] != 0) {
+			if(this.matriz[linha][j] != -1) {
 				Vertice vertice = this.vertices.get(j);
 				adjacencias.add(vertice);
 			}

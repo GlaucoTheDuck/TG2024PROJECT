@@ -71,7 +71,7 @@ public class ProjectMain {
 //					System.out.println(">> " + labels[0] + " -> " + labels[1]);//test
 //					System.out.println(">> Weight: " + labels[3]);//test
 				}else {
-					grafo.conectarVertices(vertice1, vertice2, 1);
+					grafo.conectarVertices(vertice1, vertice2, 0);
 				}
 			} while ((line = br.readLine())!= null);
 			br.close();
@@ -81,7 +81,7 @@ public class ProjectMain {
 		}
 		
 		String origem = "UnsupportedOperationException";
-		String destino = "Object";
+		String destino = "rt";
 		BuscaEmProfundidade buscaEmProfundidade = BuscaEmProfundidade.getInstance();
 		List<String> caminho = buscaEmProfundidade.buscar(grafo, origem, destino);
 		
@@ -92,10 +92,14 @@ public class ProjectMain {
 			System.out.println(" V");
 			System.out.print("(" + caminho.get(i) + " - Peso: ");
 			if(i == 0) {
-				System.out.println("0 nanosegundos)");
+				System.out.println("<100 nanosegundos)");
 			}else {
 				ultimoPesoVertice = grafo.getWeight(caminho.get(i), caminho.get(i+1)) - ultimoPesoVertice;
-				System.out.println(ultimoPesoVertice + " nanosegundos)");
+				if(ultimoPesoVertice == 0) {
+					System.out.println("<100 nanosegundos)");
+				}else {
+					System.out.println(ultimoPesoVertice + " nanosegundos)");
+				}
 			}
 		}
 	}
